@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     in.close();
 
     dnf my_dnf(file_data);
+    my_dnf.minimize();
 
     return 0;
 }

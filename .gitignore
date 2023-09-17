@@ -1,3 +1,5 @@
 build/
 .vscode/
 lab
+*.gdbinit
+*.o

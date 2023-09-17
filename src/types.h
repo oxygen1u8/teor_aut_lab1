@@ -9,6 +9,12 @@
 #define INPUT_FILE_NAME  "scale.txt"
 #define OUTPUT_FILE_NAME "mdnf.txt"
 
+#define DEBUG_EN
+
+#ifdef DEBUG_EN
+#include <iostream>
+#endif
+
 class impl {
     private:
         uint32_t num;
@@ -17,11 +23,16 @@ class impl {
         bool pw;
         bool inf;
 
-        uint32_t count(uint32_t);
+        static uint32_t count(uint32_t);
     public:
+        impl();
         impl(uint32_t);
         ~impl();
-        impl patch(impl &, impl &);
+        static impl* patch(impl &, impl &);
+
+#ifdef DEBUG_EN
+        void debug_print();
+#endif
 };
 
 class dnf {
