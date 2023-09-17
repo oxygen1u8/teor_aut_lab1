@@ -29,6 +29,12 @@ class impl {
         impl(uint32_t);
         ~impl();
         static impl* patch(impl &, impl &);
+        bool get_pw();
+        uint32_t get_num();
+        uint32_t get_p();
+        bool get_inf();
+        void set_inf(bool inf);
+        bool operator==(const impl& i);
 
 #ifdef DEBUG_EN
         void debug_print();

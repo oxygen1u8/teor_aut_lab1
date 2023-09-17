@@ -28,5 +28,11 @@ int main(int argc, char *argv[])
     dnf my_dnf(file_data);
     my_dnf.minimize();
 
+    std::ofstream out(OUTPUT_FILE_NAME);
+
+    my_dnf.print(out);
+
+    out.close();
+
     return 0;
 }

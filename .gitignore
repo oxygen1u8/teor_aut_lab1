@@ -3,3 +3,4 @@ build/
 lab
 *.gdbinit
 *.o
+mdnf.txt

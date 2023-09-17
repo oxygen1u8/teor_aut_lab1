@@ -7,6 +7,7 @@ impl::impl()
     this->ind = 0;
     this->p = 0;
     this->pw = 0;
+    this->inf = 0;
 }
 
 impl::impl(uint32_t num)
@@ -15,6 +16,7 @@ impl::impl(uint32_t num)
     this->ind = impl::count(num);
     this->p = 0;
     this->pw = 0;
+    this->inf = 0;
 }
 
 impl::~impl()
@@ -55,6 +57,40 @@ impl* impl::patch(impl &impl1, impl &impl2)
     }
 
     return nullptr;
+}
+
+void impl::set_inf(bool inf)
+{
+    this->inf = inf;
+}
+
+uint32_t impl::get_num()
+{
+    return this->num;
+}
+
+uint32_t impl::get_p()
+{
+    return this->p;
+}
+
+bool impl::get_inf()
+{
+    return this->inf;
+}
+
+bool impl::get_pw()
+{
+    return this->pw;
+}
+
+bool impl::operator==(const impl& i)
+{
+    if (i.ind == this->ind && this->inf == i.inf && this->num == i.num && this->p == i.p && this->pw == i.pw) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 #ifdef DEBUG_EN
