@@ -9,7 +9,7 @@
 #define INPUT_FILE_NAME  "scale.txt"
 #define OUTPUT_FILE_NAME "mdnf.txt"
 
-#define DEBUG_EN
+// #define DEBUG_EN
 
 #ifdef DEBUG_EN
 #include <iostream>

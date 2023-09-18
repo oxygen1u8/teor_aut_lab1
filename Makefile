@@ -1,6 +1,6 @@
 CC=g++
 LDFLAGS=
-CFLAGS=-c -Wall -ggdb
+CFLAGS=-c -Wall
 SRC_DIR=src
 SOURCES_LIST=dnf.cpp impl.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
