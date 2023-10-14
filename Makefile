@@ -1,6 +1,6 @@
 CC=g++
 LDFLAGS=
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -ggdb
 SRC_DIR=src
 SOURCES_LIST=dnf.cpp impl.cpp main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -17,4 +17,5 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
+	rm src/*.o
 	rm -rf build

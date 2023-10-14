@@ -92,6 +92,21 @@ void dnf::minimize()
     uint32_t num = 0;
     uint32_t mask = 0;
     uint32_t num_t_ = 0;
+
+    uint32_t inf_count = 0;
+
+    for (uint32_t i = 0; i < this->data.size(); i++) {
+        if (this->data.at(i).get_inf()) {
+            inf_count += 1;
+        }
+    }
+
+    bool *all_impl = new bool[this->data.size()];
+
+    for (uint32_t i = 0; i < this->data.size(); i++) {
+        all_impl[i] = 0;
+    }
+
     for (uint32_t i = 0; i < this->data.size(); i++) {
         for(uint32_t j = 0; j < tdnf_impl.size(); j++) {
             num = this->data.at(i).get_num();
@@ -120,6 +135,83 @@ void dnf::minimize()
         index = 0;
     }
 
+    for (uint32_t i = 0; i < mdnf_impl.size(); i++) {
+        mask = mdnf_impl.at(i).get_p();
+        num_t_ = mdnf_impl.at(i).get_num();
+        for (uint32_t j = 0; j < this->data.size(); j++) {
+            num = this->data.at(j).get_num();
+            if (((num & ~mask) == num_t_) && (!this->data.at(i).get_inf())) {
+                all_impl[j] = 1;
+            }
+        }
+    }
+
+    uint32_t all_impl_count = 0;
+
+    for (uint32_t i = 0; i < this->data.size(); i++) {
+        if (!this->data.at(i).get_inf() && all_impl[i]) {
+            all_impl_count += 1;
+        }
+    }
+
+    while (all_impl_count + inf_count != this->data.size()) {
+        uint32_t nacc_impl_count = 0;
+        for (uint32_t i = 0; i < this->data.size(); i++) {
+            if (!all_impl[i]) {
+                nacc_impl_count += 1;
+            }
+        }
+
+        uint32_t *nacc_impl_index = new uint32_t[nacc_impl_count - inf_count];
+
+        for (uint32_t i = 0, index = 0; i < this->data.size(); i++) {
+            if (!all_impl[i] && !this->data.at(i).get_inf()) {
+                nacc_impl_index[index++] = i;
+            }
+        }
+
+        for (uint32_t i = 0; i < tdnf_impl.size(); i++) {
+            bool is_exist = false;
+            for (uint32_t j = 0; j < mdnf_impl.size(); j++) {
+                if (mdnf_impl.at(j) == tdnf_impl.at(index)) {
+                    is_exist = true;
+                    break;
+                }
+            }
+            if (is_exist) {
+                continue;
+            }
+
+            uint32_t max_impl = 0;
+            mask = tdnf_impl.at(i).get_p();
+            num_t_ = tdnf_impl.at(i).get_num();
+            uint32_t tmp = 0;
+
+            for (uint32_t j = 0; j < nacc_impl_count; j++) {
+                num = this->data.at(nacc_impl_index[j]).get_num();
+                if ((num & ~mask) == num_t_) {
+                    tmp += 1;
+                }
+            }
+
+            if (tmp > max_impl) {
+                max_impl = tmp;
+            }
+
+            if (max_impl == nacc_impl_count) {
+                mdnf_impl.push_back(tdnf_impl.at(i));
+                delete nacc_impl_index;
+                nacc_impl_count = 0;
+                break;
+            }
+
+            delete nacc_impl_index;
+        }
+        if (nacc_impl_count == 0) {
+            break;
+        }
+    }
+
 #ifdef DEBUG_EN
     std::cout << "MDNF:" << std::endl;
     for (uint32_t i = 0; i < mdnf_impl.size(); i++) {
@@ -129,6 +221,8 @@ void dnf::minimize()
 
     this->data.clear();
     this->data = mdnf_impl;
+
+    delete all_impl;
 }
 
 void dnf::print(std::ostream &out)
