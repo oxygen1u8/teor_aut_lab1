@@ -3,7 +3,27 @@
 #include <cstdlib>
 #include <cstring>
 
-static uint32_t impl_count = 0;
+dnf::dnf()
+{
+
+}
+
+void dnf::get_dnf_from_str(std::string str_data)
+{
+#ifdef DEBUG_EN
+    std::cout << "str_data size = " << str_data.size() << std::endl;
+#endif
+    for (uint32_t i = 0; i < str_data.size(); i++) {
+        if (str_data[i] == '1' || str_data[i] == '-') {
+            impl new_impl(i);
+            if (str_data[i] == '-') {
+                new_impl.set_inf(1);
+            }
+            this->data.push_back(new_impl);
+        }
+    }
+    impl_count = std::log2(str_data.size());
+}
 
 dnf::dnf(std::string str_data)
 {
@@ -200,12 +220,14 @@ void dnf::minimize()
 
             if (max_impl == nacc_impl_count) {
                 mdnf_impl.push_back(tdnf_impl.at(i));
-                delete nacc_impl_index;
+                if (nacc_impl_count - inf_count != 0)
+                    delete nacc_impl_index;
                 nacc_impl_count = 0;
                 break;
             }
 
-            delete nacc_impl_index;
+            if (nacc_impl_count - inf_count != 0)
+                delete nacc_impl_index;
         }
         if (nacc_impl_count == 0) {
             break;

@@ -43,11 +43,14 @@ class impl {
 
 class dnf {
     private:
+        uint32_t impl_count = 0;
         std::vector<impl> data;
     public:
+        dnf();
         dnf(std::string);
         ~dnf();
 
+        void get_dnf_from_str(std::string);
         void minimize();
         void print(std::ostream &);
         impl& get_impl(uint32_t);
