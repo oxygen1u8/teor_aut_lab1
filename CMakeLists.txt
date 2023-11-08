@@ -8,6 +8,8 @@ project(lab1)
 
 add_executable(${PROJECT_NAME}
     ${SRC_DIR}/main.cpp
+    ${SRC_DIR}/dnf.cpp
+    ${SRC_DIR}/impl.cpp
 )
 
 include_directories(

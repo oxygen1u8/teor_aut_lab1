@@ -19,5 +19,8 @@ rm -rf "${build_dir}"
 mkdir -p "${build_dir}"
 cd "${build_dir}"
 
-cmake -G "Unix Makefiles" ../
+cmake -G "Unix Makefiles" \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+    -DCMAKE_BUILD_TYPE=Debug \
+    ../
 make

@@ -4,3 +4,4 @@ lab1
 *.gdbinit
 *.o
 mdnf.txt
+compile_commands.json

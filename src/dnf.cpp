@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <algorithm>
 
 dnf::dnf()
 {
@@ -115,6 +116,8 @@ void dnf::minimize()
 
     uint32_t inf_count = 0;
 
+    std::vector<uint32_t> indexes;
+
     for (uint32_t i = 0; i < this->data.size(); i++) {
         if (this->data.at(i).get_inf()) {
             inf_count += 1;
@@ -149,6 +152,7 @@ void dnf::minimize()
             }
             if (!is_exist) {
                 mdnf_impl.push_back(tdnf_impl.at(index));
+                indexes.push_back(index);
             }
         }
         impl_count = 0;
@@ -166,72 +170,77 @@ void dnf::minimize()
         }
     }
 
-    uint32_t all_impl_count = 0;
+    impl_count = 0;
+    std::vector<impl> remain_impl;
+    std::vector<impl> remain_tdnf_impl;
 
     for (uint32_t i = 0; i < this->data.size(); i++) {
-        if (!this->data.at(i).get_inf() && all_impl[i]) {
-            all_impl_count += 1;
+        if (!this->data[i].get_inf()) {
+            if (all_impl[i]) {
+                impl_count += 1;
+            } else {
+                remain_impl.push_back(this->data.at(i));
+            }
         }
     }
 
-    while (all_impl_count + inf_count != this->data.size()) {
-        uint32_t nacc_impl_count = 0;
-        for (uint32_t i = 0; i < this->data.size(); i++) {
-            if (!all_impl[i]) {
-                nacc_impl_count += 1;
-            }
-        }
-
-        uint32_t *nacc_impl_index = new uint32_t[nacc_impl_count - inf_count];
-
-        for (uint32_t i = 0, index = 0; i < this->data.size(); i++) {
-            if (!all_impl[i] && !this->data.at(i).get_inf()) {
-                nacc_impl_index[index++] = i;
-            }
-        }
-
+    bool is_exist = false;
+    if (remain_impl.size() != 0) {
         for (uint32_t i = 0; i < tdnf_impl.size(); i++) {
-            bool is_exist = false;
-            for (uint32_t j = 0; j < mdnf_impl.size(); j++) {
-                if (mdnf_impl.at(j) == tdnf_impl.at(index)) {
+            is_exist = false;
+            for (uint32_t j = 0; j < indexes.size(); j++) {
+                if (tdnf_impl[i] == tdnf_impl[indexes[j]]) {
                     is_exist = true;
                     break;
-                }
+                } 
             }
-            if (is_exist) {
-                continue;
+            if (!is_exist) {
+                remain_tdnf_impl.push_back(tdnf_impl[i]);
             }
+        }
+    }
 
-            uint32_t max_impl = 0;
-            mask = tdnf_impl.at(i).get_p();
-            num_t_ = tdnf_impl.at(i).get_num();
-            uint32_t tmp = 0;
+    uint32_t max_cover = 0;
+    uint32_t max_cover_index = 0;
+    uint32_t tmp = 0;
 
-            for (uint32_t j = 0; j < nacc_impl_count; j++) {
-                num = this->data.at(nacc_impl_index[j]).get_num();
+    uint32_t remain_impl_count = remain_impl.size();
+
+    while (remain_impl_count != 0) {
+        max_cover = 0;
+        max_cover_index = 0;
+
+        for (uint32_t i = 0; i < remain_tdnf_impl.size(); i++) {
+            tmp = 0;
+            for (uint32_t j = 0; j < remain_impl.size(); j++) {
+                num = remain_impl.at(j).get_num();
+                mask = remain_tdnf_impl.at(i).get_p();
+                num_t_ = remain_tdnf_impl.at(i).get_num();
                 if ((num & ~mask) == num_t_) {
                     tmp += 1;
                 }
             }
-
-            if (tmp > max_impl) {
-                max_impl = tmp;
+            if (tmp > max_cover) {
+                max_cover = tmp;
+                max_cover_index = i;
             }
+        }
 
-            if (max_impl == nacc_impl_count) {
-                mdnf_impl.push_back(tdnf_impl.at(i));
-                if (nacc_impl_count - inf_count != 0)
-                    delete nacc_impl_index;
-                nacc_impl_count = 0;
-                break;
+        mdnf_impl.push_back(remain_tdnf_impl[max_cover_index]);
+
+remove_impl:
+        for (uint32_t j = 0; j < remain_impl.size(); j++) {
+            num = remain_impl.at(j).get_num();
+            mask = remain_tdnf_impl[max_cover_index].get_p();
+            num_t_ = remain_tdnf_impl[max_cover_index].get_num();
+            if ((num & ~mask) == num_t_) {
+                remain_impl.erase(remain_impl.begin() + j);
+                goto remove_impl;
             }
+        }
 
-            if (nacc_impl_count - inf_count != 0)
-                delete nacc_impl_index;
-        }
-        if (nacc_impl_count == 0) {
-            break;
-        }
+        remain_tdnf_impl.erase(remain_tdnf_impl.begin() + max_cover_index);
+        remain_impl_count -= max_cover;
     }
 
 #ifdef DEBUG_EN
