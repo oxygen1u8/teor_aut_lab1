@@ -278,6 +278,30 @@ void dnf::print(std::ostream &out)
     }
 }
 
+std::vector<std::string> dnf::get_dnf()
+{
+    std::vector<std::string> result;
+    std::string buff = "";
+    uint32_t mask = 0;
+    for (uint32_t i = 0; i < impl_count; i++) {
+        mask |= (1 << i);
+        buff += '0';
+    }
+    uint32_t num = 0;
+    for (uint32_t i = 0; i < this->data.size(); i++) {
+        num = this->data.at(i).get_num();
+        for (uint32_t j = 0; j < impl_count; j++) {
+            if (!(((mask & ~this->data.at(i).get_p()) >> j) & 1)) {
+                buff[impl_count - j - 1] = '-';
+            } else {
+                buff[impl_count - j - 1] = (char) ((num >> j) & 0x1) + 48;
+            }
+        }
+        result.push_back(buff);
+    }
+    return result;
+}
+
 impl& dnf::get_impl(uint32_t num)
 {
     return this->data.at(num);

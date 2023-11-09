@@ -34,6 +34,7 @@ class impl {
         uint32_t get_p();
         bool get_inf();
         void set_inf(bool inf);
+        void get_impl_in_str();
         bool operator==(const impl& i);
 
 #ifdef DEBUG_EN
@@ -54,6 +55,7 @@ class dnf {
         void minimize();
         void print(std::ostream &);
         impl& get_impl(uint32_t);
+        std::vector<std::string> get_dnf();
 };
 
 #endif /* TYPES_H */
